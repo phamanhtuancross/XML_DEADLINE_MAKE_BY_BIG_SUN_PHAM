@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <p id ="sales">TỔNG DOANH THU</p>
+    <ul id="listOfProduct">
+    </ul>
+    <script>
+    var xhttp;
+    xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            myFunction(this);
+        }
+    };
+    xhttp.open("GET", "http://localhost:3000/data", true);
+    xhttp.send();
+
+    function myFunction(xml) {
+        var listOfChildNodes, indexOfNode, nameOfProduct,nameOfImageProduct,priceOfProduct,xmlDoc; 
+        
+        xmlDoc = xml.responseXML;
+        listOfChildNodes = xmlDoc.getElementsByTagName('Mat_hang');
+
+        var totalCostInMonth  = 0;
+
+        for (indexOfNode = 0; indexOfNode < listOfChildNodes.length; indexOfNode++) { 
+            nameOfProduct = "";
+            nameOfImageProduct = "/Media/";
+            priceOfProduct = 0;
+            
+            nameOfProduct       = listOfChildNodes[indexOfNode].getAttribute('Ten');
+            nameOfImageProduct += listOfChildNodes[indexOfNode].getAttribute('Ma_so') + ".png";
+            priceOfProduct      = listOfChildNodes[indexOfNode].getAttribute('Don_gia_Ban');
+            
+            console.log(nameOfProduct);
+            console.log(nameOfImageProduct);
+            console.log(priceOfProduct);
+
+            var Node = document.createElement("li");
+            var textOfNode = document.createElement("p");
+            textOfNode.innerHTML = nameOfProduct;
+            textOfNode.setAttribute("id","productName");
+
+            var imageOfNode = document.createElement("img");
+            imageOfNode.setAttribute("id","producImage");
+            imageOfNode.setAttribute("src", nameOfImageProduct);
+            
+            var priceOfNode = document.createElement("p");
+            priceOfNode.innerHTML = "price :" + priceOfProduct;
+            priceOfNode.setAttribute("id","productPrice")
+            
+            Node.appendChild(textOfNode);
+            Node.appendChild(imageOfNode);
+            Node.appendChild(priceOfNode);
+            
+            var InforNode= document.createElement("li");
+
+            var productSaled = listOfChildNodes[indexOfNode].getElementsByTagName("Danh_sach_Ban_hang");
+            var listOfProductSaleDeteails = productSaled[0].getElementsByTagName("Ban_hang");
+            for(var indexOfSaledDetail = 0; indexOfSaledDetail < listOfProductSaleDeteails.length;indexOfSaledDetail++){
+                
+                var date   = listOfProductSaleDeteails[ indexOfSaledDetail ].getAttribute("Ngay");
+                var price  = listOfProductSaleDeteails[ indexOfSaledDetail ].getAttribute("Don_gia");
+                var number = listOfProductSaleDeteails[ indexOfSaledDetail ].getAttribute("So_luong");
+                var cost   = listOfProductSaleDeteails[ indexOfSaledDetail ].getAttribute("Tien");
+                totalCostInMonth += parseInt(cost);
+                
+                var dateOfInforNode   = "Date :"       + date;
+                var priceOfInforNode  = "Price:"       + price;
+                var numberOfInforNode = "Number:"      + number;
+                var costOfInforNode   = "Total Cost :" + cost;
+
+                var InforElement = document.createElement("p"); 
+                InforElement.innerHTML = dateOfInforNode + " - " + priceOfInforNode + " - " + numberOfInforNode + " - "  + costOfInforNode;
+
+                console.log(date);
+                console.log(price);
+                console.log(number);
+                console.log(cost);
+                
+                InforNode.appendChild(InforElement);
+            }
+
+            Node.appendChild(InforNode);
+            document.getElementById("listOfProduct").appendChild(Node);
+            document.getElementById("sales").innerHTML = "TONG DOANH THU :" +  totalCostInMonth.toString();
+            console.log("TONHG DOANH THU :" + totalCostInMonth); 
+            
+        }
+    }
+
+    </script>
+</body>
+</html>
